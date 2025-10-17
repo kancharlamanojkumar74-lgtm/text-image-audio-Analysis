@@ -10,10 +10,17 @@ import matplotlib.pyplot as plt
 import nltk
 import random
 
+# ✅ Fix: Ensure NLTK corpora are available (for TextBlob tagging)
+nltk.download('punkt', quiet=True)
+nltk.download('averaged_perceptron_tagger', quiet=True)
+nltk.download('wordnet', quiet=True)
+
 st.title("🧠 Unstructured Data Analysis")
 
+# --- Tabs Layout ---
 tab1, tab2, tab3 = st.tabs(["🖼️ Image Analysis", "🎧 Audio Analysis", "📝 Text Analysis"])
 
+# --- TEXT ANALYSIS TAB ---
 with tab3:
     # Sample stories
     stories = [
@@ -24,7 +31,7 @@ with tab3:
         """Deep in the Amazon rainforest, a team of scientists embarked on an unprecedented expedition to discover rare medicinal plants..."""
     ]
 
-    # Initialize session_state
+    # Initialize session_state for text persistence
     if "text_area" not in st.session_state:
         st.session_state.text_area = ""
 
@@ -32,7 +39,7 @@ with tab3:
     if st.button("🎲 Random Story"):
         st.session_state.text_area = random.choice(stories)
 
-    # Text input
+    # Text input area
     st.session_state.text_area = st.text_area(
         "Paste or modify your text here:",
         value=st.session_state.text_area,
@@ -44,16 +51,17 @@ with tab3:
         text = st.session_state.text_area.strip()
 
         if text:
+            # TextBlob Analysis
             blob = TextBlob(text)
             words_and_tags = blob.tags  # (word, POS tag)
 
-            # POS extraction with filtering
+            # POS extraction
             nouns = [word for word, tag in words_and_tags if tag.startswith('NN') and word.isalpha()]
             verbs = [word for word, tag in words_and_tags if tag.startswith('VB') and word.isalpha()]
             adjectives = [word for word, tag in words_and_tags if tag.startswith('JJ') and word.isalpha()]
             adverbs = [word for word, tag in words_and_tags if tag.startswith('RB') and word.isalpha()]
 
-            # WordCloud generator
+            # Function to create wordcloud
             def make_wordcloud(words, color):
                 words = [w for w in words if w.strip()]
                 if not words:
@@ -66,7 +74,7 @@ with tab3:
                 ax.axis("off")
                 return fig
 
-            # Layout 2x2
+            # 2x2 WordCloud layout
             col1, col2 = st.columns(2)
             col3, col4 = st.columns(2)
 
@@ -108,6 +116,5 @@ with tab3:
             sentiment = blob.sentiment
             st.write(f"**Polarity:** {sentiment.polarity:.2f}")
             st.write(f"**Subjectivity:** {sentiment.subjectivity:.2f}")
-
         else:
             st.warning("Please paste or select some text first.")
