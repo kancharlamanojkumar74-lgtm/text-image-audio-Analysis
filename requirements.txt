@@ -1,0 +1,8 @@
+streamlit
+gTTS
+SpeechRecognition
+pydub
+textblob
+wordcloud
+matplotlib
+nltk
